@@ -1,1 +1,3 @@
+# Script provide a certain level of expected features
+# source <(curl -LfsS https://git.io/init.rc)
 source <(curl -LfsS https://git.io/logr.sh)
