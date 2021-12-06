@@ -1,50 +1,22 @@
-#!/usr/bin/env bash
-#
-# init.rc — all the stuff at one place
-# https://github.com/bkahlert/init
-#
-# MIT License
-#
-# Copyright (c) 2021 Dr. Björn Kahlert
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+#!/usr/bin/env bats
 
-export INIT_VERSION=0.1.0
+# TODO -h
+# TODO --help
+@test "should display help by default" {
 
-source <(curl -LfsS https://git.io/logr.sh)
+   ▔▔▔▔▔▔▔ INIT.RC 0.1.0
 
-# Usage: curl -LfsS https://git.io/recordrw | "$SHELL" -s -- COMMAND [ARGS]
-main() {
-  local usage="COMMAND [ARGS...]"
-  case ${1:-'_help'} in
-    _help)
-      printf '\n   %s\n\n   Usage: init.rc %s%s' "$(banr --static "init.rc" "$INIT_VERSION")" "$usage" '
+   Usage: init.rc COMMAND [ARGS...]
 
    Commands:
-     bash                     GNU Bourne-Again SHell
+     bats | batsw             Run Bats (Bash Automated Testing System) tests
+     recordr | recordrw       Record terminal sessions and convert them to SVG
      base32                   Transform data into printable data
      base64                   Transform data into printable data
-     bats | batsw             Run Bats (Bash Automated Testing System) tests
+     bash                     GNU Bourne-Again SHell
      guestfish                The guest filesystem shell
-     guest'""'mount               Mount a guest filesystem on the host using FUSE and libguestfs
-     guest'""'unmount             Unmount a guest'""'mounted filesystem
-     recordr | recordrw       Record terminal sessions and convert them to SVG
+     guestmount               Mount a guest filesystem on the host using FUSE and libguestfs
+     guestunmount             Unmount a guestmounted filesystem
      virt-alignment-scan      Check alignment of virtual machine partitions
      virt-builder             Build virtual machine images quickly
      virt-builder-repository  Build virt-builder source repository easily
@@ -71,8 +43,8 @@ main() {
      virt-p2v-make-kiwi       Build the virt-p2v kiwi configuration
      virt-rescue              Run a rescue shell on a virtual machine
      virt-resize              Resize a virtual machine disk
-     virt-spars'""'ify            Make a virtual machine disk sparse
-     virt-sysprep             Reset, un'""'configure or customize a virtual machine so clones can be made
+     virt-sparsify            Make a virtual machine disk sparse
+     virt-sysprep             Reset, unconfigure or customize a virtual machine so clones can be made
      virt-tail                Follow (tail) files in a virtual machine
      virt-tar                 Extract or upload files to a virtual machine
      virt-tar-in              Unpack a tarball into a virtual machine disk image
@@ -80,22 +52,11 @@ main() {
      virt-v2v                 Convert a guest to use KVM
      virt-v2v-copy-to-local   Copy a remote guest to the local machine
      virt-win-reg             Export and merge Windows Registry entries from a Windows guest
-
-'
-      exit "$EX_OK"
-      ;;
-    bats|batsw)
-      shift
-      curl -LfsS https://git.io/batsw | "$SHELL" -s -- "$@"
-      ;;
-    recordr|recordrw)
-      shift
-      curl -LfsS https://git.io/recordrw | "$SHELL" -s -- "$@"
-      ;;
-    *)
-      curl -LfsS https://git.io/libguestfsw | "$SHELL" -s -- "$@"
-      ;;
-  esac
 }
 
-main "$@"
+# TODO bats
+# TODO recordr
+# TODO virt-customize
+# TODO 5x scripts
+
+# TODO rec demos
