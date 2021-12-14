@@ -7,8 +7,11 @@
 * `libguestfs` (i.e. `guestfish`, `virt-customize`) Tools for accessing and modifying virtual machine disk images
 * `recordr` Record terminal sessions and convert them to SVG
 
-[![recorded terminal session demonstrating the init.rc](docs/demo.svg "init.rc Demo")  
-*init.rc Demo*](../../raw/main/docs/demo.svg)
+[![recorded terminal session listing provided binaries](docs/help--140x54.svg "init.rc --help")  
+*init.rc --help*](../../raw/main/docs/help--140x54.svg)
+
+[![recorded terminal session demonstrating guestfish](docs/guestfish.svg "init.rc guestfish")  
+*init.rc guestfish*](../../raw/main/docs/guestfish.svg)
 
 ## Usage
 
