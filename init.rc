@@ -124,7 +124,7 @@ main() {
       source <(curl -LfsS https://git.io/logr.sh)
       # TODO move to logr
       # Parses this script for a line documenting the parameter and returns the comment.
-      describe() { sed -En "/[[:space:]]+\['$1'].*#/p" "${BASH_SOURCE[0]}" | sed -E 's/[^#]*#[[:space:]]*(.*)$/\1/g'; }
+      describe() { sed -En "/[[:space:]]+\['$1'].*#/p" <(if [ "${BASH_SOURCE[0]-}" ]; then cat "${BASH_SOURCE[0]}"; else curl -LfsS https://git.io/init.rc; fi) | sed -E 's/[^#]*#[[:space:]]*(.*)$/\1/g'; }
       declare margin="$MARGIN  " commands=() col_width=26
       for cmd in "${!cmds[@]}"; do
         commands+=("$(printf -- '%s%*s' "$cmd" $((col_width - ${#cmd})) '')" "$(describe "$cmd") (default: ${cmds[$cmd]})")
