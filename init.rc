@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# init.rc — all the stuff at one place
+# init.rc — all tools in one place
 # https://github.com/bkahlert/init
 #
 # MIT License
@@ -25,75 +25,141 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+(return 2>/dev/null) || [ $# -gt 0 ] || set -- "-!-"
+
 export INIT_VERSION=0.1.0
 
-source <(curl -LfsS https://git.io/logr.sh)
+declare -A cmds=(
+  ['bash']=libguestfs                     # GNU Bourne-Again SHell
+  ['base32']=libguestfs                   # Transform data into printable data
+  ['base64']=libguestfs                   # Transform data into printable data
+  ['bats']=bats                           # Run Bats (Bash Automated Testing System) tests
+  ['batsw']=bats                          # Run Bats (Bash Automated Testing System) tests
+  ['guestfish']=libguestfs                # The guest filesystem shell
+  ['guestmount']=libguestfs               # Mount a guest filesystem on the host using FUSE and libguestfs
+  ['guestunmount']=libguestfs             # Unmount a guest'""'mounted filesystem
+  ['recordr']=recordr                     # Record terminal sessions and convert them to SVG
+  ['recordrw']=recordr                    # Record terminal sessions and convert them to SVG
+  ['virt-alignment-scan']=libguestfs      # Check alignment of virtual machine partitions
+  ['virt-builder']=libguestfs             # Build virtual machine images quickly
+  ['virt-builder-repository']=libguestfs  # Build virt-builder source repository easily
+  ['virt-cat']=libguestfs                 # Display files in a virtual machine
+  ['virt-copy-in']=libguestfs             # Copy files and directories into a virtual machine disk image
+  ['virt-copy-out']=libguestfs            # Copy files and directories out of a virtual machine disk image
+  ['virt-customize']=libguestfs           # Customize a virtual machine
+  ['virt-df']=libguestfs                  # Display free space on virtual filesystems
+  ['virt-dib']=libguestfs                 # Run diskimage-builder elements
+  ['virt-diff']=libguestfs                # Differences between files in two virtual machines
+  ['virt-edit']=libguestfs                # Edit a file in a virtual machine
+  ['virt-filesystems']=libguestfs         # List filesystems, partitions, block devices, LVM in a virtual machine or disk image
+  ['virt-format']=libguestfs              # Erase and make a blank disk
+  ['virt-get-kernel']=libguestfs          # Extract kernel and ramdisk from guests
+  ['virt-index-validate']=libguestfs      # Validate virt-builder index file
+  ['virt-inspector']=libguestfs           # Display operating system version and other information about a virtual machine
+  ['virt-list-filesystems']=libguestfs    # List filesystems in a virtual machine or disk image
+  ['virt-list-partitions']=libguestfs     # List partitions in a virtual machine or disk image
+  ['virt-log']=libguestfs                 # Display log files from a virtual machine
+  ['virt-ls']=libguestfs                  # List files in a virtual machine
+  ['virt-make-fs']=libguestfs             # Make a filesystem from a tar archive or files
+  ['virt-p2v-make-disk']=libguestfs       # Build the virt-p2v disk using virt-builder
+  ['virt-p2v-make-kickstart']=libguestfs  # Build the virt-p2v kickstart
+  ['virt-p2v-make-kiwi']=libguestfs       # Build the virt-p2v kiwi configuration
+  ['virt-rescue']=libguestfs              # Run a rescue shell on a virtual machine
+  ['virt-resize']=libguestfs              # Resize a virtual machine disk
+  ['virt-sparsify']=libguestfs            # Make a virtual machine disk sparse
+  ['virt-sysprep']=libguestfs             # Reset, un'""'configure or customize a virtual machine so clones can be made
+  ['virt-tail']=libguestfs                # Follow (tail) files in a virtual machine
+  ['virt-tar']=libguestfs                 # Extract or upload files to a virtual machine
+  ['virt-tar-in']=libguestfs              # Unpack a tarball into a virtual machine disk image
+  ['virt-tar-out']=libguestfs             # Pack a virtual machine disk image directory into a tarball
+  ['virt-v2v']=libguestfs                 # Convert a guest to use KVM
+  ['virt-v2v-copy-to-local']=libguestfs   # Copy a remote guest to the local machine
+  ['virt-win-reg']=libguestfs             # Export and merge Windows Registry entries from a Windows guest
+)
 
-# Usage: curl -LfsS https://git.io/recordrw | "$SHELL" -s -- COMMAND [ARGS]
+# Runs Bats (Bash Automated Testing System) tests
+bats() {
+  shift
+  curl -LfsS https://git.io/batsw | "$SHELL" -s -- "$@"
+}
+
+# Records terminal sessions and convert them to SVG
+recordr() {
+  shift
+  curl -LfsS https://git.io/recordrw | "$SHELL" -s -- "$@"
+}
+
+# Accesses and modifies virtual machine disk images
+libguestfs() {
+  curl -LfsS https://git.io/libguestfsw | "$SHELL" -s -- "$@"
+}
+
+# Creates an alias for the specified command and wrapper.
+# Arguments:
+#   1 - name of the new command
+#   2 - name of the implementing command
+create_alias() {
+  local cmd=${1?command missing} wrapper=${2?wrapper missing} wrapper_declaration patched LF=$'\n'
+  command -v "$cmd" &>/dev/null || {
+    wrapper_declaration=$(declare -f "$wrapper")
+    patched="$cmd${wrapper_declaration#"$wrapper"}"
+    eval "${patched/{/{"${LF}set -- '$cmd' \"\$@\""}"
+  }
+}
+
+# Usage:
+# - create aliases: source <(curl -LfsS https://git.io/init.rc)
+# - run single command: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS]
 main() {
   local usage="COMMAND [ARGS...]"
-  case ${1:-'_help'} in
-    _help)
-      printf '\n   %s\n\n   Usage: init.rc %s%s' "$(banr --static "init.rc" "$INIT_VERSION")" "$usage" '
 
-   Commands:
-     bash                     GNU Bourne-Again SHell
-     base32                   Transform data into printable data
-     base64                   Transform data into printable data
-     bats | batsw             Run Bats (Bash Automated Testing System) tests
-     guestfish                The guest filesystem shell
-     guest'""'mount               Mount a guest filesystem on the host using FUSE and libguestfs
-     guest'""'unmount             Unmount a guest'""'mounted filesystem
-     recordr | recordrw       Record terminal sessions and convert them to SVG
-     virt-alignment-scan      Check alignment of virtual machine partitions
-     virt-builder             Build virtual machine images quickly
-     virt-builder-repository  Build virt-builder source repository easily
-     virt-cat                 Display files in a virtual machine
-     virt-copy-in             Copy files and directories into a virtual machine disk image
-     virt-copy-out            Copy files and directories out of a virtual machine disk image
-     virt-customize           Customize a virtual machine
-     virt-df                  Display free space on virtual filesystems
-     virt-dib                 Run diskimage-builder elements
-     virt-diff                Differences between files in two virtual machines
-     virt-edit                Edit a file in a virtual machine
-     virt-filesystems         List filesystems, partitions, block devices, LVM in a virtual machine or disk image
-     virt-format              Erase and make a blank disk
-     virt-get-kernel          Extract kernel and ramdisk from guests
-     virt-index-validate      Validate virt-builder index file
-     virt-inspector           Display operating system version and other information about a virtual machine
-     virt-list-filesystems    List filesystems in a virtual machine or disk image
-     virt-list-partitions     List partitions in a virtual machine or disk image
-     virt-log                 Display log files from a virtual machine
-     virt-ls                  List files in a virtual machine
-     virt-make-fs             Make a filesystem from a tar archive or files
-     virt-p2v-make-disk       Build the virt-p2v disk using virt-builder
-     virt-p2v-make-kickstart  Build the virt-p2v kickstart
-     virt-p2v-make-kiwi       Build the virt-p2v kiwi configuration
-     virt-rescue              Run a rescue shell on a virtual machine
-     virt-resize              Resize a virtual machine disk
-     virt-spars'""'ify            Make a virtual machine disk sparse
-     virt-sysprep             Reset, un'""'configure or customize a virtual machine so clones can be made
-     virt-tail                Follow (tail) files in a virtual machine
-     virt-tar                 Extract or upload files to a virtual machine
-     virt-tar-in              Unpack a tarball into a virtual machine disk image
-     virt-tar-out             Pack a virtual machine disk image directory into a tarball
-     virt-v2v                 Convert a guest to use KVM
-     virt-v2v-copy-to-local   Copy a remote guest to the local machine
-     virt-win-reg             Export and merge Windows Registry entries from a Windows guest
+  if [ "${1-}" = '-!-' ]; then
+    set -- '--help'
+  elif [ $# -eq 0 ]; then
+    set -- '--setup'
+  fi
 
-'
+  case $1 in
+    -h|--help)
+      source <(curl -LfsS https://git.io/logr.sh)
+      # TODO move to logr
+      # Parses this script for a line documenting the parameter and returns the comment.
+      describe() { sed -En "/[[:space:]]+\['$1'].*#/p" "${BASH_SOURCE[0]}" | sed -E 's/[^#]*#[[:space:]]*(.*)$/\1/g'; }
+      declare margin="$MARGIN  " commands=() col_width=26
+      for cmd in "${!cmds[@]}"; do
+        commands+=("$(printf -- '%s%*s' "$cmd" $((col_width - ${#cmd})) '')" "$(describe "$cmd") (default: ${cmds[$cmd]})")
+      done
+      printf '\n   %s\n\n   Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- %s%s' "$(banr --static "init.rc" "$INIT_VERSION")" "$usage" "
+
+${MARGIN}Commands:
+$(printf "$margin"'%s %s\n' "${commands[@]}")
+"
       exit "$EX_OK"
       ;;
-    bats|batsw)
-      shift
-      curl -LfsS https://git.io/batsw | "$SHELL" -s -- "$@"
-      ;;
-    recordr|recordrw)
-      shift
-      curl -LfsS https://git.io/recordrw | "$SHELL" -s -- "$@"
+    --setup)
+      local cmd
+      if [ "${ZSH_VERSION-}" ]; then
+        for cmd in ${(@k)cmds}; do
+          create_alias "$cmd" "$cmds[$cmd]"
+        done
+      else
+        for cmd in "${!cmds[@]}"; do
+          create_alias "$cmd" "${cmds[$cmd]}"
+        done
+      fi
       ;;
     *)
-      curl -LfsS https://git.io/libguestfsw | "$SHELL" -s -- "$@"
+      local cmd
+      if command "$cmd" &>/dev/null; then
+        "$@"
+      else
+        if [ "${ZSH_VERSION-}" ]; then
+          cmd="$cmds[$1]"
+        else
+          cmd="${cmds[$1]}"
+        fi
+        "$cmd" "$@"
+      fi
       ;;
   esac
 }
