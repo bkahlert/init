@@ -67,6 +67,12 @@ bats_test() {
 ok 1 test--[A-Za-z0-9]+ in [0-9]+ms'
 }
 
+@test "should run jq" {
+  echo '{ "foo": "bar", "baz": null }' >test.json
+  run init.rc jq '.["foo"]' test.json
+  assert_line --partial '"bar"'
+}
+
 @test "should run recordr" {
   mkdir -p rec && echo 'echo "Hello World!"' >rec/hello.rec
   run init.rc recordr
