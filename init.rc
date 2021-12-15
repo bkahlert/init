@@ -38,6 +38,7 @@ declare -A cmds=(
   ['guestfish']=libguestfs                # The guest filesystem shell
   ['guestmount']=libguestfs               # Mount a guest filesystem on the host using FUSE and libguestfs
   ['guestunmount']=libguestfs             # Unmount a guest'""'mounted filesystem
+  ['jq']=jq                               # Command-line JSON processor
   ['recordr']=recordr                     # Record terminal sessions and convert them to SVG
   ['recordrw']=recordr                    # Record terminal sessions and convert them to SVG
   ['virt-alignment-scan']=libguestfs      # Check alignment of virtual machine partitions
@@ -81,6 +82,15 @@ declare -A cmds=(
 bats() {
   shift
   curl -LfsS https://git.io/batsw | "$SHELL" -s -- "$@"
+}
+
+# Runs a command-line JSON processor
+jq() {
+  shift
+  docker run -i \
+    -v "$PWD":"$PWD" \
+    -w "$PWD" jetbrainsinfra/jq jq \
+    "$@"
 }
 
 # Records terminal sessions and convert them to SVG
