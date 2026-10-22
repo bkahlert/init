@@ -1,15 +1,15 @@
 #!/usr/bin/env bats
 
 @test "bats wrapper ignores the login shell and preserves arguments" {
-  run_wrapper bats bats
+  run_wrapper _init_bats bats
 }
 
 @test "recordr wrapper ignores the login shell and preserves arguments" {
-  run_wrapper recordr recordr
+  run_wrapper _init_recordr recordr
 }
 
 @test "libguestfs wrapper ignores the login shell and preserves arguments" {
-  run_wrapper libguestfs
+  run_wrapper _init_libguestfs
 }
 
 run_wrapper() {

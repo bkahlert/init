@@ -59,7 +59,7 @@ bats_test() {
 
 @test "should run bats" {
   bats_test <<<'run echo "foo"; assert_output "foo"' >test.bats
-  run init.rc bats .
+  run init.rc bats --timing .
   assert_success
   assert_line '1..1'
   assert_line --regexp '^ok 1 test--[A-Za-z0-9]+ in [0-9]+ms$'
