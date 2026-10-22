@@ -40,7 +40,6 @@ bats_test() {
 }
 
 @test "should run bash" {
-  bats_test <<<'run echo "foo"; assert_output "foo"' >test.bats
   run init.rc bash -c 'echo "Hello World!"'
   assert_output --partial 'Hello World!'
 }
@@ -58,7 +57,7 @@ bats_test() {
 }
 
 @test "should run bats" {
-  bats_test <<<'run echo "foo"; assert_output "foo"' >test.bats
+  bats_test <<<'run echo "foo"; [ "$status" -eq 0 ]; [ "$output" = "foo" ]' >test.bats
   run init.rc bats --timing .
   assert_success
   assert_line '1..1'
