@@ -49,43 +49,34 @@ declare -A cmds=(
   ['virt-copy-out']=libguestfs            # Copy files and directories out of a virtual machine disk image
   ['virt-customize']=libguestfs           # Customize a virtual machine
   ['virt-df']=libguestfs                  # Display free space on virtual filesystems
-  ['virt-dib']=libguestfs                 # Run diskimage-builder elements
   ['virt-diff']=libguestfs                # Differences between files in two virtual machines
   ['virt-edit']=libguestfs                # Edit a file in a virtual machine
-  ['virt-filesystems']=libguestfs         # List filesystems, partitions, block devices, LVM in a virtual machine or disk image
+  ['virt-filesystems']=libguestfs         # List filesystems, partitions, block devices and LVM in a disk image
   ['virt-format']=libguestfs              # Erase and make a blank disk
   ['virt-get-kernel']=libguestfs          # Extract kernel and ramdisk from guests
   ['virt-index-validate']=libguestfs      # Validate virt-builder index file
-  ['virt-inspector']=libguestfs           # Display operating system version and other information about a virtual machine
-  ['virt-list-filesystems']=libguestfs    # List filesystems in a virtual machine or disk image
-  ['virt-list-partitions']=libguestfs     # List partitions in a virtual machine or disk image
+  ['virt-inspector']=libguestfs           # Display operating system and virtual machine information
   ['virt-log']=libguestfs                 # Display log files from a virtual machine
   ['virt-ls']=libguestfs                  # List files in a virtual machine
   ['virt-make-fs']=libguestfs             # Make a filesystem from a tar archive or files
-  ['virt-p2v-make-disk']=libguestfs       # Build the virt-p2v disk using virt-builder
-  ['virt-p2v-make-kickstart']=libguestfs  # Build the virt-p2v kickstart
-  ['virt-p2v-make-kiwi']=libguestfs       # Build the virt-p2v kiwi configuration
   ['virt-rescue']=libguestfs              # Run a rescue shell on a virtual machine
   ['virt-resize']=libguestfs              # Resize a virtual machine disk
   ['virt-sparsify']=libguestfs            # Make a virtual machine disk sparse
   ['virt-sysprep']=libguestfs             # Reset, un'""'configure or customize a virtual machine so clones can be made
   ['virt-tail']=libguestfs                # Follow (tail) files in a virtual machine
-  ['virt-tar']=libguestfs                 # Extract or upload files to a virtual machine
   ['virt-tar-in']=libguestfs              # Unpack a tarball into a virtual machine disk image
   ['virt-tar-out']=libguestfs             # Pack a virtual machine disk image directory into a tarball
-  ['virt-v2v']=libguestfs                 # Convert a guest to use KVM
-  ['virt-v2v-copy-to-local']=libguestfs   # Copy a remote guest to the local machine
   ['virt-win-reg']=libguestfs             # Export and merge Windows Registry entries from a Windows guest
 )
 
 # Runs Bats (Bash Automated Testing System) tests
-bats() {
+_init_bats() {
   shift
-  curl -LfsS https://git.io/batsw | "$SHELL" -s -- "$@"
+  curl -LfsS https://git.io/batsw | bash -s -- "$@"
 }
 
 # Runs a command-line JSON processor
-jq() {
+_init_jq() {
   shift
   docker run --rm -i \
     -v "$PWD":"$PWD" \
@@ -94,14 +85,14 @@ jq() {
 }
 
 # Records terminal sessions and convert them to SVG
-recordr() {
+_init_recordr() {
   shift
-  curl -LfsS https://git.io/recordrw | "$SHELL" -s -- "$@"
+  curl -LfsS https://git.io/recordrw | bash -s -- "$@"
 }
 
 # Accesses and modifies virtual machine disk images
-libguestfs() {
-  curl -LfsS https://git.io/libguestfsw | "$SHELL" -s -- "$@"
+_init_libguestfs() {
+  curl -LfsS https://git.io/libguestfsw | bash -s -- "$@"
 }
 
 # Creates an alias for the specified command and wrapper.
@@ -111,15 +102,15 @@ libguestfs() {
 create_alias() {
   local cmd=${1?command missing} wrapper=${2?wrapper missing} wrapper_declaration patched LF=$'\n'
   command -v "$cmd" &>/dev/null || {
-    wrapper_declaration=$(declare -f "$wrapper")
-    patched="$cmd${wrapper_declaration#"$wrapper"}"
+    wrapper_declaration=$(declare -f "_init_$wrapper")
+    patched="$cmd${wrapper_declaration#"_init_$wrapper"}"
     eval "${patched/{/{"${LF}set -- '$cmd' \"\$@\""}"
   }
 }
 
 # Usage:
 # - create aliases: source <(curl -LfsS https://git.io/init.rc)
-# - run single command: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS]
+# - run single command: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS]
 main() {
   local usage="COMMAND [ARGS...]"
 
@@ -131,15 +122,26 @@ main() {
 
   case $1 in
     -h|--help)
+      # shellcheck source=/dev/null
       source <(curl -LfsS https://git.io/logr.sh)
       # TODO move to logr
       # Parses this script for a line documenting the parameter and returns the comment.
-      describe() { sed -En "/[[:space:]]+\['$1'].*#/p" <(cat "${BASH_SOURCE[0]}" 2>/dev/null || curl -LfsS https://git.io/init.rc) | sed -E 's/[^#]*#[[:space:]]*(.*)$/\1/g'; }
+      describe() {
+        sed -En "/[[:space:]]+\['$1'].*#/p" \
+          <(cat "${BASH_SOURCE[0]}" 2>/dev/null || curl -LfsS https://git.io/init.rc) \
+          | sed -E 's/[^#]*#[[:space:]]*(.*)$/\1/g'
+      }
+      # MARGIN is provided by the dynamically sourced logger.
+      # shellcheck disable=SC2153
       declare margin="$MARGIN  " commands=() col_width=26
       for cmd in "${!cmds[@]}"; do
-        commands+=("$(printf -- '%s%*s' "$cmd" $((col_width - ${#cmd})) '')" "$(describe "$cmd") (default: ${cmds[$cmd]})")
+        commands+=(
+          "$(printf -- '%s%*s' "$cmd" $((col_width - ${#cmd})) '')"
+          "$(describe "$cmd") (default: ${cmds[$cmd]})"
+        )
       done
-      printf '\n   %s\n\n   Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- %s%s' "$(banr --static "init.rc" "$INIT_VERSION")" "$usage" "
+      printf '\n   %s\n\n   Usage: curl -LfsS https://git.io/init.rc | bash -s -- %s%s' \
+        "$(banr --static "init.rc" "$INIT_VERSION")" "$usage" "
 
 ${MARGIN}Commands:
 $(printf "$margin"'%s %s\n' "${commands[@]}")
@@ -149,6 +151,8 @@ $(printf "$margin"'%s %s\n' "${commands[@]}")
     --setup)
       local cmd
       if [ "${ZSH_VERSION-}" ]; then
+        # Zsh associative arrays use different expansion syntax.
+        # shellcheck disable=SC2296,SC1087,SC2128
         for cmd in ${(@k)cmds}; do
           create_alias "$cmd" "$cmds[$cmd]"
         done
@@ -160,15 +164,17 @@ $(printf "$margin"'%s %s\n' "${commands[@]}")
       ;;
     *)
       local cmd
-      if command "$cmd" &>/dev/null; then
+      if command -v "$1" &>/dev/null; then
         "$@"
       else
         if [ "${ZSH_VERSION-}" ]; then
+          # Zsh associative arrays use different expansion syntax.
+          # shellcheck disable=SC1087,SC2128
           cmd="$cmds[$1]"
         else
           cmd="${cmds[$1]}"
         fi
-        "$cmd" "$@"
+        "_init_$cmd" "$@"
       fi
       ;;
   esac

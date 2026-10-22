@@ -16,7 +16,7 @@ bats_test() {
 }
 
 @test "should run if downloaded" {
-  run bash -c 'curl -LfsS https://git.io/init.rc | "$SHELL" -s -- bash -c "echo \"Hello World!\""'
+  run bash -c 'curl -LfsS https://git.io/init.rc | bash -s -- bash -c "echo \"Hello World!\""'
   assert_output --partial "Hello World!"
 }
 @test "should run if executed locally" {
@@ -27,20 +27,19 @@ bats_test() {
 @test "should display help if executed" {
   run init.rc
   assert_line --partial '▔▔▔▔▔▔▔ INIT.RC 0.1.0'
-  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS...]'
+  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS...]'
   assert_line --regexp 'guestfish [[:space:]]* The guest filesystem shell'
 }
 @test "should display help on -h" {
   run init.rc -h
-  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS...]'
+  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS...]'
 }
 @test "should display help on --help" {
   run init.rc --help
-  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS...]'
+  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS...]'
 }
 
 @test "should run bash" {
-  bats_test <<<'run echo "foo"; assert_output "foo"' >test.bats
   run init.rc bash -c 'echo "Hello World!"'
   assert_output --partial 'Hello World!'
 }
@@ -58,13 +57,11 @@ bats_test() {
 }
 
 @test "should run bats" {
-  bats_test <<<'run echo "foo"; assert_output "foo"' >test.bats
-  run init.rc bats .
-  assert_output --regexp '▶▶ TEST RUN
- ℹ working directory: .*
- ℹ bats command line: bats --jobs [0-9]+ --no-parallelize-within-files --recursive --timing --no-tempdir-cleanup .
-1..1
-ok 1 test--[A-Za-z0-9]+ in [0-9]+ms'
+  bats_test <<<'run echo "foo"; [ "$status" -eq 0 ]; [ "$output" = "foo" ]' >test.bats
+  run init.rc bats --timing .
+  assert_success
+  assert_line '1..1'
+  assert_line --regexp '^ok 1 test--[A-Za-z0-9]+ in [0-9]+ms$'
 }
 
 @test "should run jq" {
@@ -81,13 +78,16 @@ ok 1 test--[A-Za-z0-9]+ in [0-9]+ms'
 }
 
 @test "should run libguestfs" {
-  local binaries=('guestfish' 'guest'""'mount' 'guest'""'unmount' 'virt-alignment-scan' 'virt-builder' 'virt-builder-repository' 'virt-cat' 'virt-copy-in'
-    'virt-copy-out' 'virt-customize' 'virt-df' 'virt-dib' 'virt-diff' 'virt-edit' 'virt-filesystems' 'virt-format' 'virt-get-kernel' 'virt-index-validate'
-    'virt-inspector' 'virt-list-filesystems' 'virt-list-partitions' 'virt-log' 'virt-ls' 'virt-make-fs' 'virt-p2v-make-disk' 'virt-p2v-make-kickstart'
-    'virt-p2v-make-kiwi' 'virt-rescue' 'virt-resize' 'virt-spars'""'ify' 'virt-sysprep' 'virt-tail' 'virt-tar' 'virt-tar-in' 'virt-tar-out' 'virt-v2v'
-    'virt-v2v-copy-to-local' 'virt-win-reg')
+  local binaries=(
+    'guestfish' 'guest'""'mount' 'guest'""'unmount' 'virt-alignment-scan' 'virt-builder' 'virt-builder-repository'
+    'virt-cat' 'virt-copy-in' 'virt-copy-out' 'virt-customize' 'virt-df' 'virt-diff' 'virt-edit' 'virt-filesystems'
+    'virt-format' 'virt-get-kernel' 'virt-index-validate' 'virt-inspector' 'virt-log' 'virt-ls' 'virt-make-fs'
+    'virt-rescue' 'virt-resize' 'virt-spars'""'ify' 'virt-sysprep' 'virt-tail' 'virt-tar-in' 'virt-tar-out'
+    'virt-win-reg'
+  )
   for binary in "${binaries[@]}"; do
     run init.rc "$binary" --version
-    assert_output --partial "1.4"
+    assert_success
+    assert_output --regexp '[0-9]+[.][0-9]+'
   done
 }

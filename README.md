@@ -1,17 +1,22 @@
-# init.rc [![Build Status](https://img.shields.io/github/actions/workflow/status/bkahlert/init/build.yml?label=Build&logo=github&logoColor=fff)](https://github.com/bkahlert/init/actions/workflows/build.yml) [![License](https://img.shields.io/github/license/bkahlert/init?color=29ABE2&label=License&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1OTAgNTkwIiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBkPSJNMzI4LjcgMzk1LjhjNDAuMy0xNSA2MS40LTQzLjggNjEuNC05My40UzM0OC4zIDIwOSAyOTYgMjA4LjljLTU1LjEtLjEtOTYuOCA0My42LTk2LjEgOTMuNXMyNC40IDgzIDYyLjQgOTQuOUwxOTUgNTYzQzEwNC44IDUzOS43IDEzLjIgNDMzLjMgMTMuMiAzMDIuNCAxMy4yIDE0Ny4zIDEzNy44IDIxLjUgMjk0IDIxLjVzMjgyLjggMTI1LjcgMjgyLjggMjgwLjhjMCAxMzMtOTAuOCAyMzcuOS0xODIuOSAyNjEuMWwtNjUuMi0xNjcuNnoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxOS4yMTIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4%3D)](https://github.com/bkahlert/init/blob/main/LICENSE) [![Buy Me A Coffee](https://img.shields.io/static/v1?label=&message=%E2%98%95%20Buy%20Me%20A%20Coffee&color=FFDD00)](https://www.buymeacoffee.com/bkahlert)
+# init.rc
+
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bkahlert/init/build.yml?label=Build&logo=github&logoColor=fff)](https://github.com/bkahlert/init/actions/workflows/build.yml)
+[![License](https://img.shields.io/github/license/bkahlert/init?color=29ABE2)](LICENSE)
+[![Buy Me A Coffee](https://img.shields.io/static/v1?label=&message=%E2%98%95%20Buy%20Me%20A%20Coffee&color=FFDD00)](https://www.buymeacoffee.com/bkahlert)
 
 ## About
 
-**init** provides access to the following tools in one place:
+The **init** script provides access to the following tools in one place:
+
 * `bats` Run Bats (Bash Automated Testing System) tests
 * `libguestfs` (i.e. `guestfish`, `virt-customize`) Tools for accessing and modifying virtual machine disk images
 * `recordr` Record terminal sessions and convert them to SVG
 
 [![recorded terminal session listing provided binaries](docs/help--140x54.svg "init.rc --help")  
-*init.rc --help*](../../raw/main/docs/help--140x54.svg)
+*init.rc --help*](docs/help--140x54.svg)
 
 [![recorded terminal session demonstrating guestfish](docs/guestfish.svg "init.rc guestfish")  
-*init.rc guestfish*](../../raw/main/docs/guestfish.svg)
+*init.rc guestfish*](docs/guestfish.svg)
 
 ## Usage
 
@@ -27,11 +32,13 @@ bats test
 
 ### Executing
 
+Requires Bash 4.2 or newer on `PATH` for the wrappers.
+
 If executed, a single command can be invoked without further modifications
 of the current shell session.
 
 ```shell
-curl -LfsS https://git.io/init.rc | "$SHELL" -s -- bats test
+curl -LfsS https://git.io/init.rc | bash -s -- bats test
 ```
 
 ## Testing
@@ -42,7 +49,7 @@ cd init
 
 # Use Bats wrapper to run tests
 curl -LfsS https://git.io/batsw \
-  | DOCKER_BAKE="--set '*.tags=test'" "$SHELL" -s -- --batsw:-e --batsw:BUILD_TAG=test test
+  | bash -s -- test
 ```
 
 [Bats Wrapper](https://github.com/bkahlert/bats-wrapper) is a self-contained wrapper to run tests based on the Bash testing

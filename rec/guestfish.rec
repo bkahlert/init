@@ -1,9 +1,9 @@
 #!/usr/bin/env recordr
 
 rec <<'REC'
-curl -LfsS https://git.io/init.rc | "$SHELL"
+curl -LfsS https://git.io/init.rc | bash
 REC
 
 rec <<'REC'
-curl -LfsS https://git.io/init.rc | "$SHELL" -s -- guestfish --version
+curl -LfsS https://git.io/init.rc | bash -s -- guestfish --version
 REC
