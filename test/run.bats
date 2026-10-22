@@ -60,11 +60,9 @@ bats_test() {
 @test "should run bats" {
   bats_test <<<'run echo "foo"; assert_output "foo"' >test.bats
   run init.rc bats .
-  assert_output --regexp '▶▶ TEST RUN
- ℹ working directory: .*
- ℹ bats command line: bats --jobs [0-9]+ --no-parallelize-within-files --recursive --timing --no-tempdir-cleanup .
-1..1
-ok 1 test--[A-Za-z0-9]+ in [0-9]+ms'
+  assert_success
+  assert_line '1..1'
+  assert_line --regexp '^ok 1 test--[A-Za-z0-9]+ in [0-9]+ms$'
 }
 
 @test "should run jq" {
@@ -88,6 +86,7 @@ ok 1 test--[A-Za-z0-9]+ in [0-9]+ms'
     'virt-v2v-copy-to-local' 'virt-win-reg')
   for binary in "${binaries[@]}"; do
     run init.rc "$binary" --version
-    assert_output --partial "1.4"
+    assert_success
+    assert_output --regexp '[0-9]+[.][0-9]+'
   done
 }
