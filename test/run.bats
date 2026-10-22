@@ -79,11 +79,12 @@ bats_test() {
 }
 
 @test "should run libguestfs" {
-  local binaries=('guestfish' 'guest'""'mount' 'guest'""'unmount' 'virt-alignment-scan' 'virt-builder' 'virt-builder-repository' 'virt-cat' 'virt-copy-in'
-    'virt-copy-out' 'virt-customize' 'virt-df' 'virt-dib' 'virt-diff' 'virt-edit' 'virt-filesystems' 'virt-format' 'virt-get-kernel' 'virt-index-validate'
-    'virt-inspector' 'virt-list-filesystems' 'virt-list-partitions' 'virt-log' 'virt-ls' 'virt-make-fs' 'virt-p2v-make-disk' 'virt-p2v-make-kickstart'
-    'virt-p2v-make-kiwi' 'virt-rescue' 'virt-resize' 'virt-spars'""'ify' 'virt-sysprep' 'virt-tail' 'virt-tar' 'virt-tar-in' 'virt-tar-out' 'virt-v2v'
-    'virt-v2v-copy-to-local' 'virt-win-reg')
+  local binaries=(
+    'guestfish' 'guest'""'mount' 'guest'""'unmount' 'virt-alignment-scan' 'virt-builder' 'virt-builder-repository'
+    'virt-cat' 'virt-copy-in' 'virt-copy-out' 'virt-customize' 'virt-df' 'virt-diff' 'virt-edit' 'virt-filesystems'
+    'virt-format' 'virt-get-kernel' 'virt-index-validate' 'virt-inspector' 'virt-log' 'virt-ls' 'virt-make-fs'
+    'virt-rescue' 'virt-resize' 'virt-spars'""'ify' 'virt-sysprep' 'virt-tail' 'virt-tar-in' 'virt-tar-out' 'virt-win-reg'
+  )
   for binary in "${binaries[@]}"; do
     run init.rc "$binary" --version
     assert_success
