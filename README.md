@@ -27,11 +27,13 @@ bats test
 
 ### Executing
 
+Requires Bash 4.2 or newer on `PATH` for the wrappers.
+
 If executed, a single command can be invoked without further modifications
 of the current shell session.
 
 ```shell
-curl -LfsS https://git.io/init.rc | "$SHELL" -s -- bats test
+curl -LfsS https://git.io/init.rc | bash -s -- bats test
 ```
 
 ## Testing
@@ -42,7 +44,7 @@ cd init
 
 # Use Bats wrapper to run tests
 curl -LfsS https://git.io/batsw \
-  | DOCKER_BAKE="--set '*.tags=test'" "$SHELL" -s -- --batsw:-e --batsw:BUILD_TAG=test test
+  | DOCKER_BAKE="--set '*.tags=test'" bash -s -- --batsw:-e --batsw:BUILD_TAG=test test
 ```
 
 [Bats Wrapper](https://github.com/bkahlert/bats-wrapper) is a self-contained wrapper to run tests based on the Bash testing

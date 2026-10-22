@@ -81,7 +81,7 @@ declare -A cmds=(
 # Runs Bats (Bash Automated Testing System) tests
 bats() {
   shift
-  curl -LfsS https://git.io/batsw | "$SHELL" -s -- "$@"
+  curl -LfsS https://git.io/batsw | bash -s -- "$@"
 }
 
 # Runs a command-line JSON processor
@@ -96,12 +96,12 @@ jq() {
 # Records terminal sessions and convert them to SVG
 recordr() {
   shift
-  curl -LfsS https://git.io/recordrw | "$SHELL" -s -- "$@"
+  curl -LfsS https://git.io/recordrw | bash -s -- "$@"
 }
 
 # Accesses and modifies virtual machine disk images
 libguestfs() {
-  curl -LfsS https://git.io/libguestfsw | "$SHELL" -s -- "$@"
+  curl -LfsS https://git.io/libguestfsw | bash -s -- "$@"
 }
 
 # Creates an alias for the specified command and wrapper.
@@ -119,7 +119,7 @@ create_alias() {
 
 # Usage:
 # - create aliases: source <(curl -LfsS https://git.io/init.rc)
-# - run single command: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS]
+# - run single command: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS]
 main() {
   local usage="COMMAND [ARGS...]"
 
@@ -139,7 +139,7 @@ main() {
       for cmd in "${!cmds[@]}"; do
         commands+=("$(printf -- '%s%*s' "$cmd" $((col_width - ${#cmd})) '')" "$(describe "$cmd") (default: ${cmds[$cmd]})")
       done
-      printf '\n   %s\n\n   Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- %s%s' "$(banr --static "init.rc" "$INIT_VERSION")" "$usage" "
+      printf '\n   %s\n\n   Usage: curl -LfsS https://git.io/init.rc | bash -s -- %s%s' "$(banr --static "init.rc" "$INIT_VERSION")" "$usage" "
 
 ${MARGIN}Commands:
 $(printf "$margin"'%s %s\n' "${commands[@]}")

@@ -16,7 +16,7 @@ bats_test() {
 }
 
 @test "should run if downloaded" {
-  run bash -c 'curl -LfsS https://git.io/init.rc | "$SHELL" -s -- bash -c "echo \"Hello World!\""'
+  run bash -c 'curl -LfsS https://git.io/init.rc | bash -s -- bash -c "echo \"Hello World!\""'
   assert_output --partial "Hello World!"
 }
 @test "should run if executed locally" {
@@ -27,16 +27,16 @@ bats_test() {
 @test "should display help if executed" {
   run init.rc
   assert_line --partial '▔▔▔▔▔▔▔ INIT.RC 0.1.0'
-  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS...]'
+  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS...]'
   assert_line --regexp 'guestfish [[:space:]]* The guest filesystem shell'
 }
 @test "should display help on -h" {
   run init.rc -h
-  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS...]'
+  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS...]'
 }
 @test "should display help on --help" {
   run init.rc --help
-  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | "$SHELL" -s -- COMMAND [ARGS...]'
+  assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS...]'
 }
 
 @test "should run bash" {

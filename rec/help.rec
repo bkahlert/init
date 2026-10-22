@@ -1,5 +1,5 @@
 #!/usr/bin/env recordr
 
 rec <<'REC'
-curl -LfsS https://git.io/init.rc | "$SHELL" -s -- --help
+curl -LfsS https://git.io/init.rc | bash -s -- --help
 REC
