@@ -26,7 +26,7 @@ bats_test() {
 
 @test "should display help if executed" {
   run init.rc
-  assert_line --partial '▔▔▔▔▔▔▔ INIT.RC 0.1.0'
+  assert_line --partial '▔▔▔▔▔▔▔ INIT.RC 0.2.1'
   assert_line --partial 'Usage: curl -LfsS https://git.io/init.rc | bash -s -- COMMAND [ARGS...]'
   assert_line --regexp 'guestfish [[:space:]]* The guest filesystem shell'
 }
