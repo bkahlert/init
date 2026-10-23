@@ -27,7 +27,7 @@
 
 (return 2>/dev/null) || [ $# -gt 0 ] || set -- "-!-"
 
-export INIT_VERSION=0.1.0
+export INIT_VERSION=0.2.1
 
 declare -A cmds=(
   ['bash']=libguestfs                     # GNU Bourne-Again SHell

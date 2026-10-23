@@ -12,11 +12,11 @@ The **init** script provides access to the following tools in one place:
 * `libguestfs` (i.e. `guestfish`, `virt-customize`) Tools for accessing and modifying virtual machine disk images
 * `recordr` Record terminal sessions and convert them to SVG
 
-[![recorded terminal session listing provided binaries](docs/help--140x54.svg "init.rc --help")  
-*init.rc --help*](docs/help--140x54.svg)
+[![recorded terminal session listing provided binaries](https://bkahlert.github.io/init/help.svg "init.rc --help")\
+*init.rc --help*](https://bkahlert.github.io/init/help.svg)
 
-[![recorded terminal session demonstrating guestfish](docs/guestfish.svg "init.rc guestfish")  
-*init.rc guestfish*](docs/guestfish.svg)
+[![recorded terminal session demonstrating guestfish](https://bkahlert.github.io/init/guestfish.svg "init.rc guestfish")\
+*init.rc guestfish*](https://bkahlert.github.io/init/guestfish.svg)
 
 ## Usage
 
